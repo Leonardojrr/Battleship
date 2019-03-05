@@ -1,0 +1,27 @@
+{
+  "name": "battleship",
+  "version": "1.0.0",
+  "description": "Juego de batalla naval hecho con express y socket.io",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"  
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Leonardojrr/Battleship.git"
+  },
+  "author": "Emilio B, Leonardo R",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Leonardojrr/Battleship/issues"
+  },
+  "homepage": "https://github.com/Leonardojrr/Battleship#readme",
+  "dependencies": {
+    "express": "^4.16.4",
+    "socket.io": "^2.1.1"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.6"
+  }
+}

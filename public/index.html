@@ -1,0 +1,119 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Socket.IO chat</title>
+  </head>
+  <body>
+        <div id="intro" style="position: absolute;z-index: 2;width: 100%;height: 100%;">
+                <div id="name-container" style="position: relative;top:35%;">
+                    <h3 class="white-text">Enter your username:</h3>
+                    <input type="text" id="username" style="width: 30%;text-align:center;">
+                    <br><br>
+                    <a  id="enter">Enter</a>
+                </div>
+                <h7 style="bottom: 5px;text-align: center;position: absolute;width: 100%" >DrawBoard - Create by luisedo97 and 13luismb</h7>        
+            </div>
+        <div id="all" style="height:100vh;position:absolute;z-index: 1;right: 0;" hidden>
+                <h3 style="font-size: 1vw;text-align: center;">List Client:</h3>
+                <br>
+                <div id="listUser" style="overflow: auto;height: 30%;width: 100%;">
+                </div>
+                <br><br><br>
+                <h3 style="font-size: 1vw;text-align: center;">List Message:</h3>
+                <div id="chat-window" style="overflow: auto;height:25%;width: 100%;">
+                    <div id="output"></div>
+                    <div id="typing"></div>
+                </div>
+                <div id="message-container" style="width: 100%;">
+                    <input type="text" id="message" placeholder="Message"> 
+                </div>
+            </div>
+        </div>
+  </body>
+  <script src="/socket.io/socket.io.js"></script>
+  <script >
+  const socket = io();
+
+function $(id) {
+    return document.getElementById(id);
+}
+let user;
+let listUsername = [];
+
+const message = function() {
+    let message = $('message'),
+        username = $('username'),
+        btnEnter = $('enter'),
+        output = $('output'),
+        typing = $('typing'),
+        listUser = $('listUser');
+        chatWindows = $('chat-window');
+
+    function sentMessage() {
+        socket.emit('chat message', {
+            message: message.value,
+            username: user
+        });
+        message.value="";
+        chatWindows.scrollTop = chatWindows.scrollHeight;
+    }
+
+    function sentTyping(event) {
+        socket.emit('chat typing', user);
+        if (event.keyCode === 13){
+            sentMessage();
+        }
+    }
+
+    function getMessage(data) {
+        typing.innerHTML = '';
+        let p = document.createElement('p');
+        let strong = document.createElement('strong');
+        strong.innerHTML = data.username;
+        p.appendChild(strong);
+        p.innerHTML += ": " + data.message;
+        output.appendChild(p);
+        chatWindows.scrollTop = chatWindows.scrollHeight;
+    }
+
+    function getTyping(data) {
+        let p = document.createElement('p');
+        let em = document.createElement('em');
+        em.innerHTML = data + " is typing...";
+        p.appendChild(em);
+        console.log(p);
+        typing.innerHTML = p.innerHTML;
+    }
+
+    function setUsername(){
+        user = username.value;
+        socket.emit('register user',user);
+        $('intro').hidden = true;
+        $('all').hidden = false;
+    }
+
+    function getListUser(data){
+        listUsername = data;
+        listUser.innerText = "";
+        listUsername.forEach(element => {
+            listUser.innerText += "-"+element.username+"\n";
+        });
+    }
+
+
+
+    btnEnter.addEventListener('click',setUsername,false);
+    message.addEventListener('keypress', sentTyping, false);
+    socket.on('chat message', getMessage);
+    socket.on('chat typing', getTyping);
+    socket.on('new user',getListUser);
+}
+
+window.onunload = ()=>{
+    if(user!=null)
+        socket.emit('disconnected');
+}
+
+message();
+  </script>
+</html>
