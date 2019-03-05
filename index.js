@@ -1,4 +1,3 @@
-
 var box =  document.getElementsByClassName("box");
 
 function putShoot(Pbox){
@@ -12,7 +11,7 @@ function putShip(Pbox){
 putShip(box[0])
 putShip(box[1])
 putShip(box[2])
-putShip(box[3])
+putShip(box[55])
 
 for(let i = 0;i<box.length;i++){
     box[i].addEventListener("click",function(e){
