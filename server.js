@@ -12,26 +12,10 @@ server.listen(port, () => {
 // Routing
 app.use(express.static(path.join(__dirname, 'public')));
 
-var listUsername = [];
-io.on('connection', function(socket){
-    socket.on('register user',(data)=>{
-        
-        listUsername.push({
-            id:socket.id,
-            username:data,
-            
-        });
-        console.log(data);
-        io.sockets.emit('new user',listUsername);   
-    });
-    console.log('a user connected');
-    socket.on('disconnect', function(){
-        console.log('user disconnected');
-    });
-    socket.on('chat typing', (data) => { 
-        socket.broadcast.emit('chat typing', data); 
-    });
-    socket.on('chat message', (data) => {
-         io.sockets.emit('chat message', data);
-        });
+io.on('connection',(socket)=>{
+  console.log("hola");
+  socket.on('disparo',(data)=>{
+    console.log(data);
+    io.sockets.emit('disparo',data);
+  })
 });

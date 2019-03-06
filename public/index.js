@@ -1,3 +1,4 @@
+
 var box =  document.getElementsByClassName("box");
 var ships = [{name:"Carrier",size:5},{name:"Battleship",size:4},{name:"Cruiser",size:3},{name:"Submarine",size:3},{name:"Destroyer",size:2}]
 var board = document.getElementsByClassName("board");
@@ -7,6 +8,11 @@ var rotate=false;
 var box_position=0;
 var size = ships[0].size;
 var count = 0;
+const socket =io();
+
+socket.on('disparo',(data)=>{
+    putShoot(box[data.position].firstChild)
+});
 
 for(let i=0;i<=100;i++){
     board[0].appendChild(document.createElement("div"));
@@ -32,6 +38,7 @@ for(let i = 0;i<box.length;i++){
         if(this.firstChild !== null && this.firstChild.className === "ship" && this.firstChild.childNodes[0] === undefined){
             putShoot(this.firstChild);
             console.log(`You shoot at ${i} ship!!`);
+            socket.emit('disparo',{position:i});
         }
         else if(this.firstChild === null){
             putShoot(this);
@@ -94,7 +101,6 @@ function validPosition(size,box_position,rotate,s){
                 boxsOfShip.push({position:box_position+i});
             }
         }
-        console.log(boxsOfShip);
 
         for(let i=0; i <s.length;i++){
             if(s[i].r){
@@ -108,12 +114,9 @@ function validPosition(size,box_position,rotate,s){
                 }
             }
         }
-        console.log(boxsOfBoardShips);
 
         for(var i=0;i<boxsOfShip.length;i++){
             for(var x=0;x<boxsOfBoardShips.length;x++){
-                console.log(boxsOfShip[i].position);
-                console.log(boxsOfBoardShips[x].position);
                 if(boxsOfShip[i].position === boxsOfBoardShips[x].position){
                     return !validate;
                 }
@@ -251,7 +254,6 @@ function validPosition(size,box_position,rotate,s){
                         if(validPosition(ships[count].size,box_position,rotate,shipsAtBoard)){
                             shipObj = {shipSize:ships[count].size,position:box_position,r:rotate};
                             shipsAtBoard.push(shipObj);
-                            console.log(shipsAtBoard);
                             count++
                             if(count<5){
                                 box_position = 0;
