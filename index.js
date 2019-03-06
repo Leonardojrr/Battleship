@@ -77,13 +77,10 @@ function putShipsAtBoard(s){
     }
 }
 
-        var rotate=false;
-        var choosing=true;
-        var box_position=0;
-        var size = ships[0].size;
-        var count = 0;
-       
-        putShip(size,box_position,rotate);
+function validPosition(size,box_position,rotate,s){
+    let validate = true;
+    let boxsOfShip = [];
+    let boxsOfBoardShips =[];
 
     if(count>0){
 
@@ -97,7 +94,6 @@ function putShipsAtBoard(s){
                 boxsOfShip.push({position:box_position+i});
             }
         }
-        console.log(boxsOfShip);
 
         for(let i=0; i <s.length;i++){
             if(s[i].r){
@@ -111,12 +107,9 @@ function putShipsAtBoard(s){
                 }
             }
         }
-        console.log(boxsOfBoardShips);
 
         for(var i=0;i<boxsOfShip.length;i++){
             for(var x=0;x<boxsOfBoardShips.length;x++){
-                console.log(boxsOfShip[i].position);
-                console.log(boxsOfBoardShips[x].position);
                 if(boxsOfShip[i].position === boxsOfBoardShips[x].position){
                     return !validate;
                 }
@@ -254,7 +247,6 @@ function putShipsAtBoard(s){
                         if(validPosition(ships[count].size,box_position,rotate,shipsAtBoard)){
                             shipObj = {shipSize:ships[count].size,position:box_position,r:rotate};
                             shipsAtBoard.push(shipObj);
-                            console.log(shipsAtBoard);
                             count++
                             if(count<5){
                                 box_position = 0;
