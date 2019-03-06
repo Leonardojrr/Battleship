@@ -6,7 +6,7 @@
 }
 .board{
     display: grid;
-    grid-template: repeat(8,50px) / repeat(7,50px);
+    grid-template: repeat(10,30px) / repeat(10,30px);
     grid-gap: 2px;
     justify-content: center;
     align-content: center;
@@ -22,11 +22,11 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 35px;
-    height: 35px
+    width: 21px;
+    height: 21px
 }
 .shoot{
     background:#b71616;
-    width: 10px;
-    height: 10px
+    width: 6px;
+    height: 6px
 }
