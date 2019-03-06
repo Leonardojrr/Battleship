@@ -77,10 +77,13 @@ function putShipsAtBoard(s){
     }
 }
 
-function validPosition(size,box_position,rotate,s){
-    let validate = true;
-    let boxsOfShip = [];
-    let boxsOfBoardShips =[];
+        var rotate=false;
+        var choosing=true;
+        var box_position=0;
+        var size = ships[0].size;
+        var count = 0;
+       
+        putShip(size,box_position,rotate);
 
     if(count>0){
 

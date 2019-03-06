@@ -34,4 +34,7 @@ io.on('connection', function(socket){
     socket.on('chat message', (data) => {
          io.sockets.emit('chat message', data);
         });
+    socket.on('fire', (data) => {
+         io.sockets.emit('chat message', data);
+        });
 });
