@@ -1,7 +1,9 @@
 
 var box =  document.getElementsByClassName("box");
+var boxs =  document.getElementsByClassName("boxs");
 var ships = [{name:"Carrier",size:5},{name:"Battleship",size:4},{name:"Cruiser",size:3},{name:"Submarine",size:3},{name:"Destroyer",size:2}]
 var board = document.getElementsByClassName("board");
+var boards = document.getElementsByClassName("boards");
 var shipObj;
 var shipsAtBoard = [];
 var rotate=false;
@@ -11,12 +13,17 @@ var count = 0;
 const socket =io();
 
 socket.on('disparo',(data)=>{
-    putShoot(box[data.position].firstChild)
+    putShoot(boxs[data.position])
 });
 
 for(let i=0;i<=100;i++){
     board[0].appendChild(document.createElement("div"));
     board[0].childNodes[i].className = "box";
+}
+
+for(let i=0;i<=100;i++){
+    boards[0].appendChild(document.createElement("div"));
+    boards[0].childNodes[i].className = "boxs";
 }
 
 
