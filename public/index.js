@@ -2,30 +2,42 @@
 var box =  document.getElementsByClassName("box");
 var boxs =  document.getElementsByClassName("boxs");
 var ships = [{name:"Carrier",size:5},{name:"Battleship",size:4},{name:"Cruiser",size:3},{name:"Submarine",size:3},{name:"Destroyer",size:2}]
-var board = document.getElementsByClassName("board");
-var boards = document.getElementsByClassName("boards");
+var board = document.getElementById("board");
+var container = document.getElementById("container");
 var shipObj;
 var shipsAtBoard = [];
 var rotate=false;
 var box_position=0;
 var size = ships[0].size;
 var count = 0;
-const socket =io();
+const socket = io();
+var turn = true;
+
+
 
 socket.on('disparo',(data)=>{
-    putShoot(boxs[data.position])
+    if(box[data.position].firstChild != null){
+        putShoot(box[data.position].firstChild)
+        socket.emit('respuesta',{msg:'You hit a ship'});
+    }
+    else{
+        putShoot(box[data.position])
+        socket.emit('respuesta',{msg:'You miss'});
+    }
+});
+
+socket.on('turno',(data)=>{
+    turn = data.msg
+});
+
+socket.on('respuesta',(data)=>{
+        console.log(`${data.msg}`);
 });
 
 for(let i=0;i<=100;i++){
-    board[0].appendChild(document.createElement("div"));
-    board[0].childNodes[i].className = "box";
+    board.appendChild(document.createElement("div"));
+    board.childNodes[i].className = "box";
 }
-
-for(let i=0;i<=100;i++){
-    boards[0].appendChild(document.createElement("div"));
-    boards[0].childNodes[i].className = "boxs";
-}
-
 
 function putShoot(box_position){
     box_position.appendChild(document.createElement("div"));
@@ -37,24 +49,6 @@ function putShipBox(box_position){
 }
 function removeShipBox(box_position){
     box_position.removeChild(box_position.childNodes[0])
-}
-
-
-for(let i = 0;i<box.length;i++){
-    box[i].addEventListener("click",function(e){
-        if(this.firstChild !== null && this.firstChild.className === "ship" && this.firstChild.childNodes[0] === undefined){
-            putShoot(this.firstChild);
-            console.log(`You shoot at ${i} ship!!`);
-            socket.emit('disparo',{position:i});
-        }
-        else if(this.firstChild === null){
-            putShoot(this);
-            console.log(`You miss`);
-        }
-        else{
-            console.log(`You already shooted here`);
-        }
-    },true );
 }
 
 function putShip(size,box_position,rotate){
@@ -133,7 +127,42 @@ function validPosition(size,box_position,rotate,s){
     }
     else{return validate}
 }
-       
+
+function putEnemyBoard(){
+    container.appendChild(document.createElement("div"));
+    container.childNodes[3].id = "grid";
+    container.appendChild(document.createElement("div"));
+    container.childNodes[4].id = "enter";
+    container.childNodes[3].appendChild(document.createElement("div"));
+    container.childNodes[3].childNodes[0].id = "boards";
+
+    var boards = document.getElementById("boards");
+
+    for(let i=0;i<=100;i++){
+        boards.appendChild(document.createElement("div"));
+        boards.childNodes[i].className = "boxs";
+    }
+
+    for(let i = 0;i<boxs.length;i++){
+        boxs[i].addEventListener("click",function(e){
+            if(turn){
+                 if(this.firstChild === null){
+                    putShoot(this);
+                    socket.emit('disparo',{position:i});
+                    socket.emit('turno',{msg:true});
+                    turn = false;
+                }
+                else{
+                    console.log(`You already shooted here`);
+                }
+            }
+            else{
+                console.log('No es tu turno');
+            }
+        },true );
+    }
+    
+}
         putShip(size,box_position,rotate);
 
         onkeydown = e => {
@@ -261,15 +290,13 @@ function validPosition(size,box_position,rotate,s){
                         if(validPosition(ships[count].size,box_position,rotate,shipsAtBoard)){
                             shipObj = {shipSize:ships[count].size,position:box_position,r:rotate};
                             shipsAtBoard.push(shipObj);
+                            console.log(shipsAtBoard);
                             count++
                             if(count<5){
                                 box_position = 0;
                                 size=ships[count].size;
                                 if(rotate){rotate = !rotate;}
                                 putShip(size,box_position,rotate);
-                            }
-                            else{
-    
                             }
                         }
                         else{
@@ -278,6 +305,9 @@ function validPosition(size,box_position,rotate,s){
                     }
                     else{
                         console.log(`Ya no hay mas barcos`);
+                    }
+                    if(count===5){
+                        putEnemyBoard();
                     }
                 }
         }

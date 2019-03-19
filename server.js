@@ -13,14 +13,19 @@ server.listen(port, () => {
 app.use(express.static(path.join(__dirname, 'public')));
 
 io.on('connection',(socket)=>{
-    console.log("hola");
 
+    //Cambio de turno
+    socket.on('turno',(data)=>{
+      socket.broadcast.emit('turno',data);
+    });
 
     //Disparo a nave
     socket.on('disparo',(data)=>{
-      console.log(data);
       socket.broadcast.emit('disparo',data);
     });
 
-
+    //Respuesta de disparo
+    socket.on('respuesta',(data)=>{
+      socket.broadcast.emit('respuesta',data);
+    });
 });
