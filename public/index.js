@@ -18,21 +18,48 @@ var turn = true;
 socket.on('disparo',(data)=>{
     if(box[data.position].firstChild != null){
         putShoot(box[data.position].firstChild)
-        socket.emit('respuesta',{msg:'You hit a ship'});
+        socket.emit('respuesta',{msg:'You hit a ship', roomN:room});
     }
     else{
         putShoot(box[data.position])
-        socket.emit('respuesta',{msg:'You miss'});
+        socket.emit('respuesta',{msg:'You miss',roomN:room});
     }
 });
 
 socket.on('turno',(data)=>{
     turn = data.msg
+    console.log(turn);
+    if(turn){
+    let p = document.createElement('p');
+    let strong = document.createElement('strong');
+    strong.innerHTML = 'You turn';
+    p.appendChild(strong);
+    gamelog.appendChild(p);
+    gamelog.scrollTop = gamelog.scrollHeight
+    }
 });
 
 socket.on('respuesta',(data)=>{
         console.log(`${data.msg}`);
-});
+        let p = document.createElement('p');
+        let strong = document.createElement('strong');
+        strong.innerHTML = 'You';
+        p.appendChild(strong);
+        p.innerHTML += ": " + data.msg;
+        gamelog.appendChild(p);
+        gamelog.scrollTop = gamelog.scrollHeight
+    });
+    socket.on('disparo',(data)=>{
+        console.log(`${data.position}`);
+        let p = document.createElement('p');
+        let strong = document.createElement('strong');
+        strong.innerHTML = 'Opponent';
+        p.appendChild(strong);
+        let pos = parseInt(data.position)+1;
+        p.innerHTML += ": Hit you in position " + pos;
+        gamelog.appendChild(p);
+        gamelog.scrollTop = gamelog.scrollHeight
+    });
 
 for(let i=0;i<=100;i++){
     board.appendChild(document.createElement("div"));
@@ -132,7 +159,7 @@ function putEnemyBoard(){
     container.appendChild(document.createElement("div"));
     container.childNodes[3].id = "grid";
     container.appendChild(document.createElement("div"));
-    container.childNodes[4].id = "enter";
+    //container.childNodes[4].id = "enter";
     container.childNodes[3].appendChild(document.createElement("div"));
     container.childNodes[3].childNodes[0].id = "boards";
 
@@ -148,8 +175,8 @@ function putEnemyBoard(){
             if(turn){
                  if(this.firstChild === null){
                     putShoot(this);
-                    socket.emit('disparo',{position:i});
-                    socket.emit('turno',{msg:true});
+                    socket.emit('disparo',{position:i,roomN:room});
+                    socket.emit('turno',{msg:true,roomN:room});
                     turn = false;
                 }
                 else{
@@ -311,3 +338,80 @@ function putEnemyBoard(){
                     }
                 }
         }
+        
+let room = 0;
+function $(id){
+    return document.getElementById(id);
+}
+      
+//room 
+let message = $('message');
+let output = $('output');
+let typing = $('typing');
+let gamelog = $('gameLog');
+let chatWindows = $('chat-window');
+let roomN = $('room');
+let roomId = $('roomId');
+        
+function createRoom(){
+    console.log(room)
+    socket.emit('create room');
+    $('menu').hidden = true;
+    $('game').hidden = false;
+            
+}
+//envia el mensaje
+function chat(event){
+    if(event.keyCode == 13 && message.value !==''){
+        let p = document.createElement('p');
+        let strong = document.createElement('strong');
+        strong.innerHTML = 'You';
+        p.appendChild(strong);
+        p.innerHTML += ": " + message.value;
+        output.appendChild(p);
+        chatWindows.scrollTop = chatWindows.scrollHeight;
+        socket.emit('chat msg',{msg:message.value, roomN:room});
+        message.value = '';
+    }
+}
+        
+function joinRoom(){
+    socket.emit('join room', roomN.value);
+}
+        
+//obtiene el mensaje enviado
+function getMessage(data) {
+    console.log(data)
+    let p = document.createElement('p');
+    let strong = document.createElement('strong');
+    strong.innerHTML = 'Opponent';
+    p.appendChild(strong);
+    p.innerHTML += ": " + data.msg;
+    output.appendChild(p);
+    chatWindows.scrollTop = chatWindows.scrollHeight;
+}    
+//eventos 
+$('create room').addEventListener('click', createRoom, false);
+$('join room').addEventListener('click', joinRoom, false);
+message.addEventListener('keypress', chat, false);
+socket.on('chat msg', getMessage);
+socket.on('room created', (data)=>{
+    room = data;
+    roomId.innerHTML = 'Room '+room;
+    console.log('created' + data)
+});
+
+socket.on('room joined', (data)=>{
+    room = data;
+    roomId.innerHTML = 'Room '+room;
+    $('menu').hidden = true;
+    $('game').hidden = false;
+});
+
+socket.on('error join', (data)=>{
+    alert(data);
+});        
+        
+window.onunload= ()=>{
+    socket.emit('disconnected', room);
+}

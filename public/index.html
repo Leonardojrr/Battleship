@@ -3,14 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <title>Battleship</title>
+    <link type="text/css" rel="stylesheet" href="materialize.min.css"  media="screen,projection"/>
     <link rel="stylesheet" href=".\index.css">
 </head>
-<body>
-    <div id="container">
-        <div id="grid">
-            <div id="board"></div>
+<body class="black">
+    <div id="menu" style="z-index:2;">
+        <div class="grey darken-4 container center menu-container" >
+            <h2 class="white-text" style="margin-top: 0">BattleShip</h2>
+        <ul>
+            <li><a id="create room" class="waves-effect waves-light btn blue darken-3" >Create Room</a></li>
+            <li><input type="number" id="room" placeholder="Room"> <br> 
+                <a id="join room" class="waves-effect waves-light btn blue darken-3">Join Room</a></li>
+
+        </ul>
         </div>
+
     </div>
+
+
+    <div id="game" class="row" hidden>
+            <div id="container">
+                    <div id="grid">
+                        <div id="board"></div>
+                    </div>
+                </div>
+
+            <div class="col s2 offset-s9 grey darken-4 inline"  style="height:100vh;position:absolute;z-index: 1;right: 0;">
+                <h3 class="white-text" id="roomId"></h3>
+                <br>
+                <div class="grey darken-4 white-text" id="gameLog">
+                </div>
+                <br><br><br>
+                <h3 class="white-text">Chat:</h3>
+                <div id="chat-window" class="grey darken-4 white-text">
+                <div id="output"></div>
+                </div>
+                <div id="message-container" class="grey darken-4 white-text" style="width: 100%;">
+                    <input type="text" id="message" placeholder="Message" class="white-text"> 
+                </div>
+            </div>
+        </div>
+
     <script src=".\socket.io\socket.io.js"></script>
     <script src=".\index.js"></script>
 </body>
