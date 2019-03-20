@@ -7,7 +7,7 @@ body{
     display: flex;
     justify-content: space-around;
     align-items: center;
-    width: 100%;
+    width: 80%;
     height: 626px;
     position: absolute;
 }
@@ -34,6 +34,11 @@ input[type=number]:not([readonly]):not(.browser-default):focus{
 h3{
     font-size: 1vw;text-align: center;
 }  
+body{
+    margin: 0;
+    width: 100%;
+    height: 100%;
+}
 #grid{
     width: 215px;
     height: 325px;
@@ -53,7 +58,6 @@ h3{
     grid-gap: 2px;
     justify-content: center;
     align-content: center;
-    transform: scale(0.5,0.5)
 }
 .box{
     background: #2c6ab7;
@@ -87,9 +91,37 @@ h3{
     width: 6px;
     height: 6px
 }
-#enter{
-    width: 110px;
-    height: 120px;
-    background: #00ff9d;
-    border: solid 4px #00ff11
+#restart{
+    width: 90px;
+    height: 36px;
+    background: #ff0000;
+    border: solid 2px #a70b0b;
+    border-radius: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Roboto';
+    font-size: 20px;
+    color: grey;
+    user-select: none;
 }
+#restart:hover{
+    background: #ff4747;
+}
+#enter{
+    width: 90px;
+    height: 36px;
+    background: #00ff3b;
+    border: solid 2px #1ea70b;
+    border-radius: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Roboto';
+    font-size: 20px;
+    color: grey;
+    user-select: none;
+}
+#enter:hover{
+    background: #47ff72;
+} 

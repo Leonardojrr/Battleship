@@ -18,11 +18,11 @@ var turn = true;
 socket.on('disparo',(data)=>{
     if(box[data.position].firstChild != null){
         putShoot(box[data.position].firstChild)
-        socket.emit('respuesta',{msg:'You hit a ship', roomN:room});
+        socket.emit('respuesta',{msg:'You hit a ship', roomN:room,position:data.position,ship:true});
     }
     else{
         putShoot(box[data.position])
-        socket.emit('respuesta',{msg:'You miss',roomN:room});
+        socket.emit('respuesta',{msg:'You miss',roomN:room,position:data.position,ship:false});
     }
 });
 
@@ -48,6 +48,7 @@ socket.on('respuesta',(data)=>{
         p.innerHTML += ": " + data.msg;
         gamelog.appendChild(p);
         gamelog.scrollTop = gamelog.scrollHeight
+        changeBox(data.position,data.ship);
     });
     socket.on('disparo',(data)=>{
         console.log(`${data.position}`);
@@ -66,6 +67,16 @@ for(let i=0;i<=100;i++){
     board.childNodes[i].className = "box";
 }
 
+function changeBox(position,bool){
+    boxs[position].style.background = "#2c6ab7";
+    if(bool){
+        putShipBox(boxs[position]);
+        putShoot(boxs[position].firstChild);
+    }
+    else{
+        putShoot(boxs[position]);
+    }
+}
 function putShoot(box_position){
     box_position.appendChild(document.createElement("div"));
     box_position.childNodes[0].className = "shoot";
@@ -155,41 +166,63 @@ function validPosition(size,box_position,rotate,s){
     else{return validate}
 }
 
-function putEnemyBoard(){
-    container.appendChild(document.createElement("div"));
-    container.childNodes[3].id = "grid";
-    container.appendChild(document.createElement("div"));
-    //container.childNodes[4].id = "enter";
-    container.childNodes[3].appendChild(document.createElement("div"));
-    container.childNodes[3].childNodes[0].id = "boards";
+function putButtons(){
+    grid.appendChild(document.createElement("div"));
+    grid.appendChild(document.createElement("div"));
+    grid.childNodes[3].id = "restart";
+    grid.childNodes[4].id = "enter";
+    grid.childNodes[3].innerHTML += "Restart";
+    grid.childNodes[4].innerHTML += "Play";
+    
+    grid.childNodes[3].addEventListener("click",function(e){
+        grid.childNodes[3].remove();
+        grid.childNodes[3].remove();
+        shipsAtBoard.forEach(function(shipBox){
+            removeShip(shipBox.shipSize,shipBox.position,shipBox.r)
+        });
+        shipsAtBoard.splice(0,5);
+        count = 0;
+        rotate=false;
+        box_position=0;
+        size = ships[0].size;
+        putShip(size,box_position,rotate)
+    },true);
 
-    var boards = document.getElementById("boards");
-
-    for(let i=0;i<=100;i++){
-        boards.appendChild(document.createElement("div"));
-        boards.childNodes[i].className = "boxs";
-    }
-
-    for(let i = 0;i<boxs.length;i++){
-        boxs[i].addEventListener("click",function(e){
-            if(turn){
-                 if(this.firstChild === null){
-                    putShoot(this);
-                    socket.emit('disparo',{position:i,roomN:room});
-                    socket.emit('turno',{msg:true,roomN:room});
-                    turn = false;
+    grid.childNodes[4].addEventListener("click",function(e){
+        grid.childNodes[3].remove();
+        grid.childNodes[3].remove();
+        container.appendChild(document.createElement("div"));
+        container.childNodes[3].id = "grid";
+        container.childNodes[3].appendChild(document.createElement("div"));
+        container.childNodes[3].childNodes[0].id = "boards";
+        
+        var boards = document.getElementById("boards");
+        
+        for(let i=0;i<=100;i++){
+            boards.appendChild(document.createElement("div"));
+            boards.childNodes[i].className = "boxs";
+        }
+        
+        for(let i = 0;i<boxs.length;i++){
+            boxs[i].addEventListener("click",function(e){
+                if(turn){
+                     if(this.firstChild === null){
+                        socket.emit('disparo',{position:i,roomN:room});
+                        socket.emit('turno',{msg:true,roomN:room});
+                        turn = false;
+                    }
+                    else{
+                        console.log(`You already shooted here`);
+                    }
                 }
                 else{
-                    console.log(`You already shooted here`);
+                    console.log('No es tu turno');
                 }
-            }
-            else{
-                console.log('No es tu turno');
-            }
-        },true );
-    }
-    
+            },true );
+        }
+    },true);
 }
+
         putShip(size,box_position,rotate);
 
         onkeydown = e => {
@@ -325,6 +358,9 @@ function putEnemyBoard(){
                                 if(rotate){rotate = !rotate;}
                                 putShip(size,box_position,rotate);
                             }
+                            if(count===5){
+                                putButtons();
+                            }
                         }
                         else{
                             console.log(`Posicion no valida`);
@@ -332,9 +368,6 @@ function putEnemyBoard(){
                     }
                     else{
                         console.log(`Ya no hay mas barcos`);
-                    }
-                    if(count===5){
-                        putEnemyBoard();
                     }
                 }
         }
